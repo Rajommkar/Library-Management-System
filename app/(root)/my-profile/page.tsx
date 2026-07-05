@@ -5,6 +5,8 @@ import BookList from "@/components/BookList";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import BookCard from "@/components/BookCard";
+import BookReceipt from "@/components/BookReceipt";
+import { IKImage } from "imagekitio-next";
 
 const ProfilePage = async () => {
   const session = await auth();
@@ -26,6 +28,19 @@ const ProfilePage = async () => {
               <p>Name: <span className="font-semibold text-primary">{session.user?.name}</span></p>
               <p>Email: <span className="font-semibold text-primary">{session.user?.email}</span></p>
             </div>
+
+            {/* University Card Display */}
+            <div className="mt-8">
+              <p className="text-sm text-light-500 mb-2">University ID Card:</p>
+              <div className="relative w-full h-40 rounded-lg overflow-hidden border-2 border-dark-300">
+                <Image
+                  src={(session.user as any)?.universityCard || "/images/no-books.png"}
+                  alt="University Card"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+            </div>
           </div>
         </section>
 
@@ -41,19 +56,16 @@ const ProfilePage = async () => {
                   <BookCard {...record.book} isLoanedBook />
                   
                   <div className="flex flex-col gap-2 mt-2 w-full xs:w-52">
-                    <div className="flex justify-between items-center bg-dark-300 px-3 py-2 rounded-md border border-light-100/10">
-                      <p className="text-xs text-light-700 font-semibold">Borrowed</p>
-                      <p className="text-xs text-white">{new Date(record.borrow.borrowDate).toLocaleDateString()}</p>
+                    {/* The receipt component (usually toggled via modal, but we show it inline or hide it behind a button in full version. For now we just render it below the book.) */}
+                    <div className="mt-4 scale-[0.6] origin-top-left xl:scale-75">
+                      <BookReceipt 
+                        title={record.book.title}
+                        author={record.book.author}
+                        borrowDate={new Date(record.borrow.borrowDate).toDateString()}
+                        dueDate={new Date(record.borrow.dueDate).toDateString()}
+                        universityId={(session.user as any)?.universityId || 123456}
+                      />
                     </div>
-                    <div className="flex justify-between items-center bg-dark-300 px-3 py-2 rounded-md border border-light-100/10">
-                      <p className="text-xs text-light-700 font-semibold">Due</p>
-                      <p className="text-xs text-white">{new Date(record.borrow.dueDate).toLocaleDateString()}</p>
-                    </div>
-
-                    <Button className="w-full bg-light-300 text-dark-300 hover:bg-light-300/80 font-bebas-neue mt-2">
-                      <Image src="/icons/book.svg" alt="receipt" width={20} height={20} className="mr-2" />
-                      Download Receipt
-                    </Button>
                   </div>
                 </div>
               ))}

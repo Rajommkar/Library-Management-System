@@ -6,9 +6,19 @@ import { eq } from "drizzle-orm";
 import { hash } from "bcryptjs";
 import { signIn } from "@/auth";
 import { AuthCredentials } from "@/types";
+import { headers } from "next/headers";
+import { ratelimit } from "@/lib/ratelimit";
+import { workflowClient } from "@/lib/workflow";
 
 export const signUp = async (params: AuthCredentials) => {
   const { fullname, email, universityId, password, universityCard } = params;
+
+  const ip = (await headers()).get("x-forwarded-for") || "127.0.0.1";
+  const { success } = await ratelimit.limit(ip);
+
+  if (!success) {
+    return { success: false, error: "Too many requests" };
+  }
 
   // Check if user already exists
   const existingUser = await db
@@ -32,6 +42,14 @@ export const signUp = async (params: AuthCredentials) => {
       universityCard,
     });
 
+    await workflowClient.trigger({
+      url: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/api/workflows/onboarding`,
+      body: {
+        email,
+        fullName: fullname,
+      },
+    });
+
     await signInWithCredentials({ email, password });
 
     return { success: true };
@@ -45,6 +63,13 @@ export const signInWithCredentials = async (
   params: Pick<AuthCredentials, "email" | "password">
 ) => {
   const { email, password } = params;
+
+  const ip = (await headers()).get("x-forwarded-for") || "127.0.0.1";
+  const { success } = await ratelimit.limit(ip);
+
+  if (!success) {
+    return { success: false, error: "Too many requests" };
+  }
 
   try {
     const result = await signIn("credentials", {
