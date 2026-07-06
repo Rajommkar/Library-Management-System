@@ -96,83 +96,9 @@ const BookForm = ({ type, book }: Props) => {
           name="title"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-dark-100 font-semibold">Title</FormLabel>
+              <FormLabel className="text-dark-100 font-semibold">Book Title</FormLabel>
               <FormControl>
-                <Input required className="border-light-500 text-dark-100 bg-white" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <FormField
-            control={form.control}
-            name="author"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-dark-100 font-semibold">Author</FormLabel>
-                <FormControl>
-                  <Input required className="border-light-500 text-dark-100 bg-white" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          
-          <FormField
-            control={form.control}
-            name="genre"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-dark-100 font-semibold">Genre</FormLabel>
-                <FormControl>
-                  <Input required className="border-light-500 text-dark-100 bg-white" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <FormField
-            control={form.control}
-            name="rating"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-dark-100 font-semibold">Rating (1-5)</FormLabel>
-                <FormControl>
-                  <Input type="number" min={1} max={5} required className="border-light-500 text-dark-100 bg-white" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          
-          <FormField
-            control={form.control}
-            name="totalCopies"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-dark-100 font-semibold">Total Copies</FormLabel>
-                <FormControl>
-                  <Input type="number" min={1} required className="border-light-500 text-dark-100 bg-white" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-dark-100 font-semibold">Description</FormLabel>
-              <FormControl>
-                <Textarea required className="border-light-500 text-dark-100 bg-white resize-none" rows={3} {...field} />
+                <Input required className="border-light-500 text-dark-100 bg-white" placeholder="Enter the book title" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -181,76 +107,107 @@ const BookForm = ({ type, book }: Props) => {
         
         <FormField
           control={form.control}
-          name="summary"
+          name="author"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-dark-100 font-semibold">Summary</FormLabel>
+              <FormLabel className="text-dark-100 font-semibold">Author</FormLabel>
               <FormControl>
-                <Textarea required className="border-light-500 text-dark-100 bg-white resize-none" rows={5} {...field} />
+                <Input required className="border-light-500 text-dark-100 bg-white" placeholder="Enter the author name" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+        <FormField
+          control={form.control}
+          name="genre"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-dark-100 font-semibold">Genre</FormLabel>
+              <FormControl>
+                <Input required className="border-light-500 text-dark-100 bg-white" placeholder="Enter the genre of the book" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <FormField
-            control={form.control}
-            name="coverUrl"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-dark-100 font-semibold">Book Cover</FormLabel>
-                <FormControl>
-                  <ImageUpload
-                    onFileChange={field.onChange}
-                    type="image"
-                    variant="light"
-                    value={field.value}
+        <FormField
+          control={form.control}
+          name="totalCopies"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-dark-100 font-semibold">Total number of books</FormLabel>
+              <FormControl>
+                <Input type="number" min={1} required className="border-light-500 text-dark-100 bg-white" placeholder="Enter the total number of books" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="coverUrl"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-dark-100 font-semibold">Book Image</FormLabel>
+              <FormControl>
+                <ImageUpload
+                  onFileChange={field.onChange}
+                  type="image"
+                  variant="light"
+                  value={field.value}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+        <FormField
+          control={form.control}
+          name="coverColor"
+          render={({ field }) => (
+            <FormItem className="relative">
+              <FormLabel className="text-dark-100 font-semibold">Book Primary Color</FormLabel>
+              <FormControl>
+                <div className="flex items-center rounded-md border border-light-500 bg-white px-3 py-2 shadow-sm focus-within:ring-1 focus-within:ring-ring">
+                  <div 
+                    className="size-6 rounded-sm cursor-pointer shadow-sm border border-light-400 mr-3"
+                    style={{ backgroundColor: field.value }}
+                    onClick={() => setShowColorPicker(!showColorPicker)}
                   />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          
-          <FormField
-            control={form.control}
-            name="coverColor"
-            render={({ field }) => (
-              <FormItem className="relative">
-                <FormLabel className="text-dark-100 font-semibold">Primary Color</FormLabel>
-                <FormControl>
-                  <div className="flex gap-4 items-center">
-                    <div 
-                      className="size-14 rounded-md border border-light-400 cursor-pointer shadow-sm"
-                      style={{ backgroundColor: field.value }}
-                      onClick={() => setShowColorPicker(!showColorPicker)}
-                    />
-                    <Input className="w-full border-light-500 text-dark-100 bg-white uppercase" {...field} />
+                  <input 
+                    type="text" 
+                    className="flex-1 bg-transparent text-sm font-medium outline-none uppercase text-dark-100" 
+                    value={field.value}
+                    onChange={field.onChange}
+                  />
+                </div>
+              </FormControl>
+              
+              {showColorPicker && (
+                <div className="absolute top-20 z-10 bg-white p-3 rounded-lg shadow-lg border border-light-400">
+                  <div className="flex justify-between mb-2">
+                    <span className="font-semibold text-sm">Pick color</span>
+                    <button type="button" onClick={() => setShowColorPicker(false)} className="text-light-500 text-sm">Close</button>
                   </div>
-                </FormControl>
-                
-                {showColorPicker && (
-                  <div className="absolute top-20 z-10 bg-white p-3 rounded-lg shadow-lg border border-light-400">
-                    <div className="flex justify-between mb-2">
-                      <span className="font-semibold text-sm">Pick color</span>
-                      <button type="button" onClick={() => setShowColorPicker(false)} className="text-light-500 text-sm">Close</button>
-                    </div>
-                    <HexColorPicker color={field.value} onChange={field.onChange} />
-                  </div>
-                )}
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+                  <HexColorPicker color={field.value} onChange={field.onChange} />
+                </div>
+              )}
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         <FormField
           control={form.control}
           name="videoUrl"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-dark-100 font-semibold">Book Trailer Video</FormLabel>
+              <FormLabel className="text-dark-100 font-semibold">Book Video</FormLabel>
               <FormControl>
                 <ImageUpload
                   onFileChange={field.onChange}
@@ -265,8 +222,53 @@ const BookForm = ({ type, book }: Props) => {
           )}
         />
 
-        <Button type="submit" className="bg-primary-admin hover:bg-primary-admin/90 mt-5 w-full md:w-auto self-start" disabled={isSubmitting}>
-          {isSubmitting ? "Saving..." : type === "create" ? "Add Book" : "Update Book"}
+        <FormField
+          control={form.control}
+          name="summary"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-dark-100 font-semibold">Book Summary</FormLabel>
+              <FormControl>
+                <Textarea required className="border-light-500 text-dark-100 bg-white resize-none" rows={5} placeholder="Write a brief summary of the book" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Additional backend-required fields not originally in mockup */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-light-400 mt-6">
+          <FormField
+            control={form.control}
+            name="rating"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-dark-100 font-semibold">Rating (1-5) *</FormLabel>
+                <FormControl>
+                  <Input type="number" min={1} max={5} required className="border-light-500 text-dark-100 bg-white" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-dark-100 font-semibold">Detailed Description *</FormLabel>
+                <FormControl>
+                  <Textarea required className="border-light-500 text-dark-100 bg-white resize-none" rows={3} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <Button type="submit" className="bg-primary-admin hover:bg-primary-admin/90 mt-5 w-full font-semibold text-white py-6 rounded-lg" disabled={isSubmitting}>
+          {isSubmitting ? "Saving..." : type === "create" ? "Add Book to Library" : "Update Book"}
         </Button>
       </form>
     </Form>

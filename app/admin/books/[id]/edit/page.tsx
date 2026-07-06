@@ -22,9 +22,9 @@ const EditBook = async ({ params }: { params: Promise<{ id: string }> }) => {
           <h2 className="text-2xl font-semibold text-dark-100">Edit Book</h2>
           <p className="text-light-500 mt-1">Update details for "{book.title}"</p>
         </div>
-        <Link href="/admin/books">
-          <Button variant="outline">Back to Books</Button>
-        </Link>
+        <Button variant="outline" asChild>
+          <Link href="/admin/books">Back to Books</Link>
+        </Button>
       </div>
 
       <div className="bg-white p-5 sm:p-10 rounded-xl shadow-sm max-w-4xl">

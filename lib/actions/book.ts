@@ -75,7 +75,11 @@ export const getAllBooks = async (params: {
       .select()
       .from(books)
       .where(conditions.length ? and(...conditions) : undefined)
-      .orderBy(sort === "oldest" ? books.createdAt : desc(books.createdAt))
+      .orderBy(
+        sort === "asc" ? books.title : 
+        sort === "desc" ? desc(books.title) : 
+        desc(books.createdAt)
+      )
       .limit(limit)
       .offset(offset);
 

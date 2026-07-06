@@ -13,14 +13,16 @@ const AdminLayout = async ({ children }: { children: ReactNode }) => {
   }
 
   return (
-    <main className="flex min-h-screen w-full flex-row bg-light-800">
-      <Sidebar session={session} />
+    <main className="flex min-h-screen w-full flex-row bg-white">
+      <div className="flex w-full flex-row overflow-hidden">
+        <Sidebar session={session} />
 
-      <div className="flex w-full flex-1 flex-col sm:ml-64">
-        <Header session={session} />
+        <div className="flex w-full flex-1 flex-col bg-white h-screen overflow-y-auto">
+          <Header session={session} />
 
-        <div className="flex-1 p-5 sm:p-10">
-          {children}
+          <div className="flex-1 p-5 sm:p-10">
+            {children}
+          </div>
         </div>
       </div>
       <Toaster />

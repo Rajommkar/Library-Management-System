@@ -3,7 +3,7 @@ import { getPendingUsers } from "@/lib/actions/admin";
 import dayjs from "dayjs";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { getInitials } from "@/lib/utils";
-import UserActions from "@/components/admin/UserActions";
+import AccountRequestActions from "@/components/admin/AccountRequestActions";
 import Image from "next/image";
 
 const AccountRequestsPage = async () => {
@@ -59,7 +59,7 @@ const AccountRequestsPage = async () => {
                   {dayjs(user.createAt).format("DD MMM YYYY")}
                 </td>
                 <td className="px-4 py-4">
-                  <UserActions user={user} />
+                  <AccountRequestActions user={user} />
                 </td>
               </tr>
             ))}

@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import { getAllBorrowRecords } from "@/lib/actions/admin";
 import dayjs from "dayjs";
 import BookCover from "@/components/BookCover";
@@ -47,14 +48,14 @@ const BorrowRecordsPage = async ({
             {records.map((record: any) => (
               <tr key={record.borrow.id} className="text-dark-100 hover:bg-light-300">
                 <td className="px-4 py-4">
-                  <div className="flex items-center gap-3">
+                  <Link href={`/admin/books/${record.book.id}`} className="flex items-center gap-3 hover:opacity-80 transition-opacity w-full h-full min-h-[50px]">
                     <BookCover
                       variant="extraSmall"
                       coverColor={record.book.coverColor}
                       coverImage={record.book.coverUrl}
                     />
-                    <p className="font-semibold max-w-[150px] truncate" title={record.book.title}>{record.book.title}</p>
-                  </div>
+                    <p className="font-semibold text-primary-admin max-w-[150px] truncate" title={record.book.title}>{record.book.title}</p>
+                  </Link>
                 </td>
                 <td className="px-4 py-4">
                   <div className="flex items-center gap-3">

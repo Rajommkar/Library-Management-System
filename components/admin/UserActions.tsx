@@ -2,8 +2,9 @@
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { updateUserRole, updateUserStatus } from "@/lib/actions/admin";
+import { updateUserRole, updateUserStatus, deleteUser } from "@/lib/actions/admin";
 import { useToast } from "@/hooks/use-toast";
+import Image from "next/image";
 
 const UserActions = ({ user }: { user: any }) => {
   const { toast } = useToast();
@@ -36,37 +37,30 @@ const UserActions = ({ user }: { user: any }) => {
     setLoading(false);
   };
 
-  return (
-    <div className="flex items-center gap-2">
-      <Button
-        variant="outline"
-        size="sm"
-        disabled={loading}
-        onClick={handleRoleChange}
-      >
-        Make {user.role === "ADMIN" ? "USER" : "ADMIN"}
-      </Button>
+  const handleDeleteUser = async () => {
+    if (!confirm("Are you sure you want to delete this user? This action cannot be undone.")) return;
+    
+    setLoading(true);
+    const res = await deleteUser(user.id);
+    
+    if (res.success) {
+      toast({ title: "Success", description: "User deleted successfully" });
+      window.location.reload();
+    } else {
+      toast({ title: "Error", description: res.error, variant: "destructive" });
+    }
+    setLoading(false);
+  };
 
-      {user.status === "PENDING" && (
-        <>
-          <Button
-            size="sm"
-            disabled={loading}
-            onClick={() => handleStatusChange("APPROVED")}
-            className="bg-green-600 hover:bg-green-700"
-          >
-            Approve
-          </Button>
-          <Button
-            size="sm"
-            variant="destructive"
-            disabled={loading}
-            onClick={() => handleStatusChange("REJECTED")}
-          >
-            Reject
-          </Button>
-        </>
-      )}
+  return (
+    <div className="flex items-center justify-center gap-2">
+      <button
+        disabled={loading}
+        onClick={handleDeleteUser}
+        className="text-red-500 hover:bg-red-50 p-2 rounded-full transition-colors"
+      >
+        <Image src="/icons/admin/trash.svg" alt="delete" width={20} height={20} className="filter invert-[40%] sepia-[68%] saturate-[2280%] hue-rotate-[336deg] brightness-[98%] contrast-[95%]" />
+      </button>
     </div>
   );
 };

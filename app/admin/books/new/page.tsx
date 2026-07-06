@@ -11,9 +11,9 @@ const AddNewBook = () => {
           <h2 className="text-2xl font-semibold text-dark-100">Add New Book</h2>
           <p className="text-light-500 mt-1">Fill in the details to add a new book to the library.</p>
         </div>
-        <Link href="/admin/books">
-          <Button variant="outline">Back to Books</Button>
-        </Link>
+        <Button variant="outline" asChild>
+          <Link href="/admin/books">Back to Books</Link>
+        </Button>
       </div>
 
       <div className="bg-white p-5 sm:p-10 rounded-xl shadow-sm max-w-4xl">

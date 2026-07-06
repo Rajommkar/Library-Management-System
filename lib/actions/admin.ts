@@ -4,8 +4,8 @@ import { db } from "@/database/drizzle";
 import { users, borrowRecords, books } from "@/database/schema";
 import { eq, desc, ilike, and, sql, ne } from "drizzle-orm";
 
-export const getAllUsers = async (params: { query?: string; page?: number }) => {
-  const { query = "", page = 1 } = params;
+export const getAllUsers = async (params: { query?: string; page?: number; sort?: string }) => {
+  const { query = "", page = 1, sort = "desc" } = params;
   const limit = 20;
   const offset = (page - 1) * limit;
 
@@ -16,7 +16,7 @@ export const getAllUsers = async (params: { query?: string; page?: number }) => 
       .select()
       .from(users)
       .where(conditions.length ? and(...conditions) : undefined)
-      .orderBy(desc(users.createAt))
+      .orderBy(sort === "asc" ? users.fullname : desc(users.createAt))
       .limit(limit)
       .offset(offset);
 
@@ -25,9 +25,23 @@ export const getAllUsers = async (params: { query?: string; page?: number }) => 
       .from(users)
       .where(conditions.length ? and(...conditions) : undefined);
 
+    const usersWithCounts = await Promise.all(
+      allUsers.map(async (user) => {
+        const [borrowCount] = await db
+          .select({ count: sql<number>`count(*)` })
+          .from(borrowRecords)
+          .where(eq(borrowRecords.userId, user.id));
+        
+        return {
+          ...user,
+          booksBorrowed: Number(borrowCount.count),
+        };
+      })
+    );
+
     return {
       success: true,
-      data: JSON.parse(JSON.stringify(allUsers)),
+      data: JSON.parse(JSON.stringify(usersWithCounts)),
       metadata: {
         totalPages: Math.ceil(Number(totalCount[0].count) / limit),
       },
@@ -190,6 +204,19 @@ export const getAdminStats = async () => {
       .orderBy(desc(users.createAt))
       .limit(5);
 
+    const recentBooks = await db
+      .select()
+      .from(books)
+      .orderBy(desc(books.createdAt))
+      .limit(5);
+
+    const accountRequests = await db
+      .select()
+      .from(users)
+      .where(eq(users.status, "PENDING"))
+      .orderBy(desc(users.createAt))
+      .limit(4);
+
     return {
       success: true,
       data: {
@@ -201,10 +228,77 @@ export const getAdminStats = async () => {
         newBorrowsThisWeek: Number(newBorrowsThisWeek.count),
         recentBorrows: JSON.parse(JSON.stringify(recentBorrows)),
         recentUsers: JSON.parse(JSON.stringify(recentUsers)),
+        recentBooks: JSON.parse(JSON.stringify(recentBooks)),
+        accountRequests: JSON.parse(JSON.stringify(accountRequests)),
       },
     };
   } catch (error) {
     console.error("Admin stats error:", error);
     return { success: false, error: "Error fetching stats" };
+  }
+};
+
+export const deleteUser = async (userId: string) => {
+  try {
+    // Check if user has active borrow records
+    const activeBorrows = await db
+      .select()
+      .from(borrowRecords)
+      .where(and(eq(borrowRecords.userId, userId), eq(borrowRecords.status, "BORROWED")))
+      .limit(1);
+
+    if (activeBorrows.length > 0) {
+      return { success: false, error: "Cannot delete user with active borrowed books" };
+    }
+
+    // Delete user's borrow records first to avoid foreign key constraints
+    await db.delete(borrowRecords).where(eq(borrowRecords.userId, userId));
+
+    // Delete the user
+    await db.delete(users).where(eq(users.id, userId));
+
+    return { success: true };
+  } catch (error) {
+    console.error("Delete user error:", error);
+    return { success: false, error: "Error deleting user" };
+  }
+};
+
+export const createUser = async (params: {
+  fullName: string;
+  email: string;
+  universityId: number;
+  universityCard: string;
+  role: "USER" | "ADMIN";
+}) => {
+  try {
+    const existingUser = await db
+      .select()
+      .from(users)
+      .where(eq(users.email, params.email))
+      .limit(1);
+
+    if (existingUser.length > 0) {
+      return { success: false, error: "User already exists" };
+    }
+
+    // Because it is created by Admin, we can assume it's approved and generate a random password
+    const bcrypt = await import("bcryptjs");
+    const hashedPassword = await bcrypt.hash("Password123!", 10);
+
+    const newUser = await db.insert(users).values({
+      fullname: params.fullName,
+      email: params.email,
+      universityId: params.universityId,
+      universityCard: params.universityCard || "https://ik.imagekit.io/jsmastery/default-card.png",
+      password: hashedPassword,
+      status: "APPROVED",
+      role: params.role,
+    }).returning();
+
+    return { success: true, data: JSON.parse(JSON.stringify(newUser[0])) };
+  } catch (error) {
+    console.error("Create user error:", error);
+    return { success: false, error: "Error creating user" };
   }
 };

@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import BookCard from "@/components/BookCard";
 import BookReceipt from "@/components/BookReceipt";
-import { IKImage } from "imagekitio-next";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 const ProfilePage = async () => {
@@ -57,9 +56,8 @@ const ProfilePage = async () => {
 
             <div className="relative w-full aspect-[1.58] rounded-xl overflow-hidden border-2 border-dark-400 shadow-md">
               {(session.user as any)?.universityCard ? (
-                <IKImage
-                  path={(session.user as any)?.universityCard as string}
-                  urlEndpoint={process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT}
+                <Image
+                  src={(session.user as any)?.universityCard as string}
                   alt="University Card"
                   fill
                   className="object-cover"
