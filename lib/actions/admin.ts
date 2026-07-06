@@ -57,7 +57,17 @@ export const updateUserStatus = async (
   status: "APPROVED" | "REJECTED"
 ) => {
   try {
-    await db.update(users).set({ status }).where(eq(users.id, userId));
+    const updatedUser = await db.update(users).set({ status }).where(eq(users.id, userId)).returning();
+    
+    if (status === "APPROVED" && updatedUser.length > 0) {
+      const { sendAccountApprovedEmail } = await import("../resend");
+      try {
+        await sendAccountApprovedEmail(updatedUser[0].email, updatedUser[0].fullname);
+      } catch (emailError) {
+        console.error("Failed to send approval email:", emailError);
+      }
+    }
+    
     return { success: true };
   } catch (error) {
     console.error("Update user status error:", error);

@@ -4,6 +4,7 @@ import {
   sendBorrowConfirmationEmail,
   sendDueDateReminderEmail,
   sendPenaltyEmail,
+  sendBookReceiptEmail,
 } from "@/lib/resend";
 import { serve } from "@upstash/workflow/nextjs";
 import { eq } from "drizzle-orm";
@@ -44,6 +45,18 @@ export const { POST } = serve<BorrowData>(async (context) => {
       user.email,
       user.fullname,
       book.title,
+      dayjs(record.borrowDate).format("DD MMM YYYY"),
+      dayjs(record.dueDate).format("DD MMM YYYY")
+    );
+  });
+
+  // Step 1.5: Send receipt email
+  await context.run("send-book-receipt", async () => {
+    await sendBookReceiptEmail(
+      user.email,
+      user.fullname,
+      book.title,
+      dayjs(record.borrowDate).format("DD MMM YYYY"),
       dayjs(record.dueDate).format("DD MMM YYYY")
     );
   });
