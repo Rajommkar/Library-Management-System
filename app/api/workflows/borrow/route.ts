@@ -54,10 +54,13 @@ export const { POST } = serve<BorrowData>(async (context) => {
   await context.run("send-book-receipt", async () => {
     await sendBookReceiptEmail(
       user.email,
-      user.fullname,
       book.title,
+      book.author,
+      book.genre,
       dayjs(record.borrowDate).format("DD MMM YYYY"),
-      dayjs(record.dueDate).format("DD MMM YYYY")
+      dayjs(record.dueDate).format("DD MMM YYYY"),
+      dayjs(record.dueDate).diff(dayjs(record.borrowDate), 'day'),
+      record.id
     );
   });
 

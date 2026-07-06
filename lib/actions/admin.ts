@@ -196,6 +196,18 @@ export const updateBorrowStatus = async (
         .update(books)
         .set({ availableCopies: sql`available_copies + 1` })
         .where(eq(books.id, record[0].bookId));
+
+      try {
+        const book = await db.select().from(books).where(eq(books.id, record[0].bookId)).limit(1);
+        const user = await db.select().from(users).where(eq(users.id, record[0].userId)).limit(1);
+        
+        if (book.length > 0 && user.length > 0) {
+          const { sendReturnConfirmationEmail } = await import("../resend");
+          await sendReturnConfirmationEmail(user[0].email, user[0].fullname, book[0].title);
+        }
+      } catch (error) {
+        console.error("Return confirmation email error:", error);
+      }
     }
 
     return { success: true };

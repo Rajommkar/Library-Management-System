@@ -1,6 +1,11 @@
 import { db } from "@/database/drizzle";
 import { users } from "@/database/schema";
-import { sendWelcomeEmail } from "@/lib/resend";
+import { 
+  sendWelcomeEmail,
+  sendInactivityEmail,
+  sendCheckInReminderEmail,
+  sendMilestoneCongratsEmail
+} from "@/lib/resend";
 import { serve } from "@upstash/workflow/nextjs";
 import { eq } from "drizzle-orm";
 
@@ -45,6 +50,8 @@ export const { POST } = serve<UserData>(async (context) => {
 
   await context.sleep("wait-for-3-days", 60 * 60 * 24 * 3);
 
+  let loopCount = 0;
+
   while (true) {
     const state = await context.run("check-user-state", async () => {
       return await getUserState(email);
@@ -52,15 +59,19 @@ export const { POST } = serve<UserData>(async (context) => {
 
     if (state === "non-active") {
       await context.run("send-email-non-active", async () => {
-        // Send a 'we miss you' or 'activity' email
-        // We'll skip sending the actual email to keep it simple, but we will run the step.
+        if (loopCount === 0) {
+          await sendInactivityEmail(email, fullName);
+        } else {
+          await sendCheckInReminderEmail(email, fullName);
+        }
       });
     } else if (state === "active") {
       await context.run("send-email-active", async () => {
-        // Send newsletter or updates
+        await sendMilestoneCongratsEmail(email, fullName);
       });
     }
 
+    loopCount++;
     await context.sleep("wait-for-1-month", 60 * 60 * 24 * 30);
   }
 });
