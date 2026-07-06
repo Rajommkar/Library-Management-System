@@ -92,9 +92,10 @@ const BorrowStatusButton = ({ borrowId, currentStatus, dueDate }: Props) => {
       <SelectTrigger
         className={`h-8 w-[110px] rounded-full border-none px-4 py-1 text-xs font-semibold focus:ring-0 [&>span>svg]:hidden flex items-center justify-center ${getBadgeStyle(visualState)}`}
       >
-        <SelectValue asChild>
-          <span>{getLabel(visualState)}</span>
-        </SelectValue>
+        {getLabel(visualState)}
+        <span className="hidden">
+          <SelectValue />
+        </span>
       </SelectTrigger>
       <SelectContent className="rounded-xl border-none shadow-lg p-2 min-w-[140px] z-[100]">
         {status === "PENDING" && (
