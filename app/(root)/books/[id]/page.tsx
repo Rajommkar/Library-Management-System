@@ -56,7 +56,7 @@ const BookDetails = async ({ params }: { params: Promise<{ id: string }> }) => {
 
       {similarBooks.length > 0 && (
         <BookList
-          title="More Books"
+          title="More similar books"
           books={similarBooks}
           containerClassName="mt-28"
         />

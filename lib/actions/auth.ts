@@ -14,10 +14,15 @@ export const signUp = async (params: AuthCredentials) => {
   const { fullname, email, universityId, password, universityCard } = params;
 
   const ip = (await headers()).get("x-forwarded-for") || "127.0.0.1";
-  const { success } = await ratelimit.limit(ip);
-
-  if (!success) {
-    return { success: false, error: "Too many requests" };
+  
+  try {
+    const { success } = await ratelimit.limit(ip);
+    if (!success) {
+      return { success: false, error: "Too many requests" };
+    }
+  } catch (err) {
+    console.error("Ratelimit error:", err);
+    // Fallback: If redis is not configured properly or unreachable, allow the request
   }
 
   // Check if user already exists
@@ -65,10 +70,15 @@ export const signInWithCredentials = async (
   const { email, password } = params;
 
   const ip = (await headers()).get("x-forwarded-for") || "127.0.0.1";
-  const { success } = await ratelimit.limit(ip);
-
-  if (!success) {
-    return { success: false, error: "Too many requests" };
+  
+  try {
+    const { success } = await ratelimit.limit(ip);
+    if (!success) {
+      return { success: false, error: "Too many requests" };
+    }
+  } catch (err) {
+    console.error("Ratelimit error:", err);
+    // Fallback: If redis is not configured properly or unreachable, allow the request
   }
 
   try {

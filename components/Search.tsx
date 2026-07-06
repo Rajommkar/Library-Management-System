@@ -32,7 +32,7 @@ const Search = () => {
   return (
     <div className="search">
       <Image
-        src="/icons/search.svg"
+        src="/icons/search-fill.svg"
         alt="search"
         width={24}
         height={24}

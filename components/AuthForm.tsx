@@ -78,12 +78,12 @@ const AuthForm = <T extends FieldValues>({
   return (
     <div className="flex flex-col gap-4">
       <h1 className="text-2xl font-semibold text-white">
-        {isSignIn ? "Welcome back to BookWise" : "Create your library account"}
+        {isSignIn ? "Welcome Back to the BookWise" : "Create Your Library Account"}
       </h1>
       <p className="text-light-100">
         {isSignIn
-          ? "Access the vast collection of resources, and stay updated."
-          : "Please complete all fields and upload a valid university ID to gain access to the library."}
+          ? "Access the vast collection of resources, and stay updated"
+          : "Please complete all fields and upload a valid university ID to gain access to the library"}
       </p>
 
       <Form {...form}>
@@ -126,20 +126,20 @@ const AuthForm = <T extends FieldValues>({
             {isSubmitting
               ? "Submitting..."
               : isSignIn
-              ? "Sign In"
+              ? "Login"
               : "Sign Up"}
           </Button>
         </form>
       </Form>
 
       <p className="text-center text-base font-medium text-light-100">
-        {isSignIn ? "New to BookWise? " : "Already have an account? "}
+        {isSignIn ? "Don't have an account already? " : "Have an account already? "}
 
         <Link
           href={isSignIn ? "/sign-up" : "/sign-in"}
           className="font-bold text-primary hover:underline"
         >
-          {isSignIn ? "Create an account" : "Sign in"}
+          {isSignIn ? "Register here" : "Login"}
         </Link>
       </p>
     </div>
