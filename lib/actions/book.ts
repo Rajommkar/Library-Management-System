@@ -6,6 +6,7 @@ import { eq, and, desc, ilike, or, sql } from "drizzle-orm";
 import { auth } from "@/auth";
 import dayjs from "dayjs";
 import { BookParams, BorrowBookParams } from "@/types";
+import { workflowClient } from "../workflow";
 
 export const borrowBook = async (params: BorrowBookParams) => {
   const { bookId, userId } = params;
@@ -36,6 +37,17 @@ export const borrowBook = async (params: BorrowBookParams) => {
       .update(books)
       .set({ availableCopies: book[0].availableCopies - 1 })
       .where(eq(books.id, bookId));
+
+    try {
+      await workflowClient.trigger({
+        url: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/api/workflows/borrow`,
+        body: {
+          borrowId: record[0].id,
+        },
+      });
+    } catch (workflowError) {
+      console.error("Workflow trigger error (continuing anyway):", workflowError);
+    }
 
     return { success: true, data: JSON.parse(JSON.stringify(record[0])) };
   } catch (error: any) {

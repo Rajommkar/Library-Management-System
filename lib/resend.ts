@@ -130,3 +130,31 @@ export const sendDueDateReminderEmail = async (
     `,
   });
 };
+
+export const sendPenaltyEmail = async (
+  email: string,
+  name: string,
+  bookTitle: string,
+  dueDate: string,
+  daysLate: number
+) => {
+  return sendEmail({
+    email,
+    subject: `Overdue Penalty Notice: "${bookTitle}"`,
+    message: `
+      <h2 style="color: #EF3A4B; margin-top: 0;">Overdue Penalty Notice ⚠️</h2>
+      <p style="color: #D6E0FF; line-height: 1.6;">Hi ${name},</p>
+      <p style="color: #D6E0FF; line-height: 1.6;">
+        Our records indicate that <strong style="color: #E7C9A5;">"${bookTitle}"</strong> is currently 
+        <strong style="color: #EF3A4B;">${daysLate} day(s) overdue</strong>.
+      </p>
+      <div style="margin-top: 24px; padding: 16px; background: #333C5C; border-radius: 8px;">
+        <p style="color: #8D8D8D; margin: 0; font-size: 12px;">DUE DATE WAS</p>
+        <p style="color: #EF3A4B; margin: 4px 0 0; font-size: 20px; font-weight: bold;">${dueDate}</p>
+      </div>
+      <p style="color: #D6E0FF; line-height: 1.6; margin-top: 16px;">
+        Please return the book immediately. Additional late fees and account restrictions may apply if the book is not returned promptly.
+      </p>
+    `,
+  });
+};
