@@ -133,7 +133,7 @@ export const getAllBorrowRecords = async (params: {
 
 export const updateBorrowStatus = async (
   borrowId: string,
-  status: "BORROWED" | "RETURNED"
+  status: "PENDING" | "BORROWED" | "RETURNED" | "REJECTED"
 ) => {
   try {
     const record = await db
@@ -144,15 +144,44 @@ export const updateBorrowStatus = async (
 
     if (!record.length) return { success: false, error: "Record not found" };
 
+    if (status === "BORROWED" && record[0].status === "PENDING") {
+      const book = await db
+        .select()
+        .from(books)
+        .where(eq(books.id, record[0].bookId))
+        .limit(1);
+
+      if (!book.length || book[0].availableCopies <= 0) {
+        return { success: false, error: "Book is not available" };
+      }
+
+      await db
+        .update(books)
+        .set({ availableCopies: sql`available_copies - 1` })
+        .where(eq(books.id, record[0].bookId));
+        
+      const { workflowClient } = await import("../workflow");
+      try {
+        await workflowClient.trigger({
+          url: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/api/workflows/borrow`,
+          body: {
+            borrowId: record[0].id,
+          },
+        });
+      } catch (workflowError) {
+        console.error("Workflow trigger error (continuing anyway):", workflowError);
+      }
+    }
+
     await db
       .update(borrowRecords)
       .set({
         status,
-        returnDate: status === "RETURNED" ? new Date().toDateString() : null,
+        returnDate: status === "RETURNED" ? new Date().toDateString() : record[0].returnDate,
       })
       .where(eq(borrowRecords.id, borrowId));
 
-    if (status === "RETURNED") {
+    if (status === "RETURNED" && record[0].status === "BORROWED") {
       await db
         .update(books)
         .set({ availableCopies: sql`available_copies + 1` })

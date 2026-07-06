@@ -43,7 +43,7 @@ const BorrowBook = ({
       if (result.success) {
         toast({
           title: "Success",
-          description: "Book borrowed successfully",
+          description: "Borrow request sent to the admin",
           variant: "success",
         });
 
@@ -74,7 +74,7 @@ const BorrowBook = ({
     >
       <Image src="/icons/book.svg" alt="book" width={20} height={20} />
       <p className="font-bebas-neue text-xl text-dark-100">
-        {borrowing ? "Borrowing ..." : "Borrow Book"}
+        {borrowing ? "Requesting..." : "Borrow Book"}
       </p>
     </Button>
   );

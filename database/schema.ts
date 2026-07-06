@@ -2,10 +2,10 @@ import { pgTable, varchar, integer, pgEnum, uuid, date, text, timestamp } from "
 
 export const STATUS_ENUM = pgEnum("status", ["PENDING", "APPROVED", "REJECTED"]);
 export const ROLE_ENUM = pgEnum("role", ["USER", "ADMIN"]);
-export const BORROW_STATUS_ENUM = pgEnum("borrow_status", ["BORROWED", "RETURNED"]);
+export const BORROW_STATUS_ENUM = pgEnum("borrow_status", ["PENDING", "BORROWED", "RETURNED", "REJECTED"]);
 
 export const users = pgTable("users", {
-  id: uuid("id").notNull().primaryKey().defaultRandom().unique(),
+  id: uuid("id").notNull().primaryKey().defaultRandom(),
   fullname: varchar("fullname", { length: 255 }).notNull(),
   email: text("email").notNull().unique(),
   universityId: integer("university_id").notNull().unique(),
@@ -18,7 +18,7 @@ export const users = pgTable("users", {
 });
 
 export const books = pgTable("books", {
-  id: uuid("id").notNull().primaryKey().defaultRandom().unique(),
+  id: uuid("id").notNull().primaryKey().defaultRandom(),
   title: varchar("title", { length: 255 }).notNull(),
   author: varchar("author", { length: 255 }).notNull(),
   genre: text("genre").notNull(),
@@ -34,7 +34,7 @@ export const books = pgTable("books", {
 });
 
 export const borrowRecords = pgTable("borrow_records", {
-  id: uuid("id").notNull().primaryKey().defaultRandom().unique(),
+  id: uuid("id").notNull().primaryKey().defaultRandom(),
   userId: uuid("user_id").notNull().references(() => users.id),
   bookId: uuid("book_id").notNull().references(() => books.id),
   borrowDate: date("borrow_date").notNull().defaultNow(),
