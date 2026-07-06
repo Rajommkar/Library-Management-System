@@ -6,8 +6,6 @@ import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
 import {
   AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
@@ -19,7 +17,8 @@ import {
 const AccountRequestActions = ({ user }: { user: any }) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
-  const [open, setOpen] = useState(false);
+  const [denyOpen, setDenyOpen] = useState(false);
+  const [approveOpen, setApproveOpen] = useState(false);
 
   const handleApprove = async () => {
     setLoading(true);
@@ -32,6 +31,7 @@ const AccountRequestActions = ({ user }: { user: any }) => {
       toast({ title: "Error", description: res.error, variant: "destructive" });
     }
     setLoading(false);
+    setApproveOpen(false);
   };
 
   const handleDeny = async () => {
@@ -45,20 +45,49 @@ const AccountRequestActions = ({ user }: { user: any }) => {
       toast({ title: "Error", description: res.error, variant: "destructive" });
     }
     setLoading(false);
-    setOpen(false);
+    setDenyOpen(false);
   };
 
   return (
     <div className="flex items-center gap-4">
-      <button
-        disabled={loading}
-        onClick={handleApprove}
-        className="rounded-md bg-green-50 px-4 py-2 text-sm font-semibold text-green-700 hover:bg-green-100 transition-colors disabled:opacity-50"
-      >
-        Approve Account
-      </button>
+      <AlertDialog open={approveOpen} onOpenChange={setApproveOpen}>
+        <AlertDialogTrigger asChild>
+          <button
+            disabled={loading}
+            className="rounded-md bg-green-50 px-4 py-2 text-sm font-semibold text-green-700 hover:bg-green-100 transition-colors disabled:opacity-50"
+          >
+            Approve Account
+          </button>
+        </AlertDialogTrigger>
+        <AlertDialogContent className="max-w-md bg-white p-8 text-center sm:rounded-2xl flex flex-col items-center border-none">
+          <button onClick={() => setApproveOpen(false)} className="absolute right-4 top-4 text-light-500 hover:text-dark-100">
+            <Image src="/icons/admin/close.svg" alt="Close" width={20} height={20} />
+          </button>
+          
+          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100/50">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-600">
+              <Image src="/icons/admin/check.svg" alt="check" width={20} height={20} className="filter brightness-0 invert" />
+            </div>
+          </div>
+          <AlertDialogHeader className="mb-6 flex flex-col items-center text-center space-y-0">
+            <AlertDialogTitle className="text-xl font-bold text-dark-400">Approve Account Request</AlertDialogTitle>
+            <AlertDialogDescription className="text-sm text-dark-100 mt-2 max-w-[280px]">
+              Approve the student's account request and grant access. A confirmation email will be sent upon approval.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="w-full flex-col sm:flex-col gap-2 sm:space-x-0">
+            <button
+              onClick={handleApprove}
+              disabled={loading}
+              className="w-full rounded-md bg-[#487355] py-3 text-sm font-bold text-white hover:bg-[#3b5e45] transition-colors disabled:opacity-50"
+            >
+              {loading ? "Approving..." : "Approve & Send Confirmation"}
+            </button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
-      <AlertDialog open={open} onOpenChange={setOpen}>
+      <AlertDialog open={denyOpen} onOpenChange={setDenyOpen}>
         <AlertDialogTrigger asChild>
           <button 
             disabled={loading}
@@ -67,8 +96,8 @@ const AccountRequestActions = ({ user }: { user: any }) => {
             <Image src="/icons/admin/close.svg" alt="Deny" width={12} height={12} className="filter invert-[35%] sepia-[57%] saturate-[2805%] hue-rotate-[340deg] brightness-[98%] contrast-[92%]" />
           </button>
         </AlertDialogTrigger>
-        <AlertDialogContent className="max-w-md bg-white p-8 text-center sm:rounded-2xl flex flex-col items-center">
-          <button onClick={() => setOpen(false)} className="absolute right-4 top-4 text-light-500 hover:text-dark-100">
+        <AlertDialogContent className="max-w-md bg-white p-8 text-center sm:rounded-2xl flex flex-col items-center border-none">
+          <button onClick={() => setDenyOpen(false)} className="absolute right-4 top-4 text-light-500 hover:text-dark-100">
             <Image src="/icons/admin/close.svg" alt="Close" width={20} height={20} />
           </button>
           

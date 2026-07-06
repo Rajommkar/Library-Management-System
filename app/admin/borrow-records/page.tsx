@@ -2,6 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { getAllBorrowRecords } from "@/lib/actions/admin";
 import dayjs from "dayjs";
+import Image from "next/image";
 import BookCover from "@/components/BookCover";
 import Search from "@/components/Search";
 import Pagination from "@/components/Pagination";
@@ -25,11 +26,15 @@ const BorrowRecordsPage = async ({
   return (
     <div className="flex flex-col gap-5">
       <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-center">
-        <h2 className="text-2xl font-semibold text-dark-100">Borrow Records</h2>
+        <h2 className="text-2xl font-semibold text-dark-100">Borrow Book Requests</h2>
       </div>
 
-      <div className="mb-5 bg-white p-5 rounded-xl">
+      <div className="mb-5 flex justify-between items-center bg-white p-5 rounded-xl">
         <Search />
+        <div className="flex items-center gap-2 text-sm text-dark-400 font-semibold cursor-pointer">
+          Oldest to Recent
+          <Image src="/icons/admin/users.svg" alt="sort" width={16} height={16} className="opacity-60 rotate-180" />
+        </div>
       </div>
 
       <div className="overflow-x-auto rounded-xl bg-white p-5 shadow-sm">
@@ -37,11 +42,12 @@ const BorrowRecordsPage = async ({
           <thead className="border-b border-light-400 text-light-500">
             <tr>
               <th className="px-4 py-3 font-semibold">Book</th>
-              <th className="px-4 py-3 font-semibold">User</th>
-              <th className="px-4 py-3 font-semibold">Borrow Date</th>
+              <th className="px-4 py-3 font-semibold">User Requested</th>
+              <th className="px-4 py-3 font-semibold text-center">Status</th>
+              <th className="px-4 py-3 font-semibold">Borrowed date</th>
+              <th className="px-4 py-3 font-semibold">Return date</th>
               <th className="px-4 py-3 font-semibold">Due Date</th>
-              <th className="px-4 py-3 font-semibold">Status</th>
-              <th className="px-4 py-3 font-semibold">Actions</th>
+              <th className="px-4 py-3 font-semibold">Receipt</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-light-400">
@@ -71,27 +77,28 @@ const BorrowRecordsPage = async ({
                   </div>
                 </td>
                 <td className="px-4 py-4">
-                  {dayjs(record.borrow.borrowDate).format("DD MMM YYYY")}
+                  <div className="flex justify-center">
+                    <BorrowStatusButton
+                      borrowId={record.borrow.id}
+                      currentStatus={record.borrow.status}
+                      dueDate={record.borrow.dueDate}
+                    />
+                  </div>
                 </td>
                 <td className="px-4 py-4">
-                  {dayjs(record.borrow.dueDate).format("DD MMM YYYY")}
+                  {dayjs(record.borrow.borrowDate).format("MMM DD YYYY")}
                 </td>
                 <td className="px-4 py-4">
-                  <span
-                    className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                      record.borrow.status === "RETURNED"
-                        ? "bg-green-100 text-green-800"
-                        : "bg-yellow-100 text-yellow-800"
-                    }`}
-                  >
-                    {record.borrow.status}
-                  </span>
+                  {record.borrow.returnDate ? dayjs(record.borrow.returnDate).format("MMM DD YYYY") : "-"}
                 </td>
                 <td className="px-4 py-4">
-                  <BorrowStatusButton
-                    borrowId={record.borrow.id}
-                    currentStatus={record.borrow.status}
-                  />
+                  {dayjs(record.borrow.dueDate).format("MMM DD YYYY")}
+                </td>
+                <td className="px-4 py-4">
+                  <button className="flex items-center gap-1.5 text-primary-admin hover:opacity-80 transition-opacity bg-light-300 px-3 py-1.5 rounded-md text-xs font-semibold">
+                    <Image src="/icons/admin/receipt.svg" alt="receipt" width={14} height={14} />
+                    Generate
+                  </button>
                 </td>
               </tr>
             ))}

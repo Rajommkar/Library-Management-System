@@ -12,19 +12,23 @@ const AccountRequestsPage = async () => {
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-center">
-        <h2 className="text-2xl font-semibold text-dark-100">Account Requests</h2>
+      <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-center bg-white p-5 rounded-xl mb-2">
+        <h2 className="text-xl font-semibold text-dark-400">Account Registration Requests</h2>
+        <div className="flex items-center gap-2 text-sm text-dark-400 font-semibold cursor-pointer bg-light-300 px-3 py-1.5 rounded-md">
+          Oldest to Recent
+          <Image src="/icons/admin/users.svg" alt="sort" width={16} height={16} className="opacity-60 rotate-180" />
+        </div>
       </div>
 
       <div className="overflow-x-auto rounded-xl bg-white p-5 shadow-sm">
         <table className="w-full text-left text-sm">
           <thead className="border-b border-light-400 text-light-500">
             <tr>
-              <th className="px-4 py-3 font-semibold">User Details</th>
-              <th className="px-4 py-3 font-semibold">University ID</th>
-              <th className="px-4 py-3 font-semibold">ID Card</th>
-              <th className="px-4 py-3 font-semibold">Date Registered</th>
-              <th className="px-4 py-3 font-semibold">Actions</th>
+              <th className="px-4 py-3 font-semibold">Name</th>
+              <th className="px-4 py-3 font-semibold">Date Joined</th>
+              <th className="px-4 py-3 font-semibold">University ID No</th>
+              <th className="px-4 py-3 font-semibold">University ID Card</th>
+              <th className="px-4 py-3 font-semibold text-center">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-light-400">
@@ -38,27 +42,27 @@ const AccountRequestsPage = async () => {
                       </AvatarFallback>
                     </Avatar>
                     <div>
-                      <p className="font-semibold">{user.fullname}</p>
+                      <p className="font-semibold text-dark-400">{user.fullname}</p>
                       <p className="text-xs text-light-500">{user.email}</p>
                     </div>
                   </div>
                 </td>
-                <td className="px-4 py-4 font-mono">{user.universityId}</td>
+                <td className="px-4 py-4 font-semibold text-dark-400">
+                  {dayjs(user.createAt).format("MMM DD YYYY")}
+                </td>
+                <td className="px-4 py-4 font-semibold text-dark-400">{user.universityId}</td>
                 <td className="px-4 py-4">
                   <a
                     href={user.universityCard}
                     target="_blank"
                     rel="noreferrer"
-                    className="flex items-center gap-2 text-primary-admin hover:underline"
+                    className="flex items-center gap-2 text-primary-admin hover:underline text-sm font-semibold"
                   >
-                    <Image src="/icons/admin/bookmark.svg" alt="card" width={16} height={16} />
-                    View Card
+                    <Image src="/icons/admin/eye.svg" alt="card" width={16} height={16} />
+                    View ID Card
                   </a>
                 </td>
-                <td className="px-4 py-4">
-                  {dayjs(user.createAt).format("DD MMM YYYY")}
-                </td>
-                <td className="px-4 py-4">
+                <td className="px-4 py-4 flex justify-center">
                   <AccountRequestActions user={user} />
                 </td>
               </tr>
