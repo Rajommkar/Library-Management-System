@@ -44,6 +44,7 @@ const AuthForm = <T extends FieldValues>({
   const router = useRouter();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isAdminLogin, setIsAdminLogin] = useState(false);
 
   const isSignIn = type === "SIGN_IN";
 
@@ -61,10 +62,10 @@ const AuthForm = <T extends FieldValues>({
         title: "Success",
         description: isSignIn
           ? "You have successfully signed in."
-          : "You have successfully signed up. Please wait for admin approval.",
+          : "Sign up is successful. You can now login.",
       });
 
-      router.push("/");
+      router.push((result as any).redirectTo || (isSignIn ? "/" : "/sign-in"));
     } else {
       toast({
         title: `Error ${isSignIn ? "signing in" : "signing up"}`,
@@ -78,10 +79,16 @@ const AuthForm = <T extends FieldValues>({
   return (
     <div className="flex flex-col gap-4">
       <h1 className="text-2xl font-semibold text-white">
-        {isSignIn ? "Welcome Back to the BookWise" : "Create Your Library Account"}
+        {isAdminLogin 
+          ? "Welcome Back, Admin" 
+          : isSignIn 
+          ? "Welcome Back to BookWise" 
+          : "Create Your Library Account"}
       </h1>
       <p className="text-light-100">
-        {isSignIn
+        {isAdminLogin
+          ? "Please enter your admin credentials to access the dashboard"
+          : isSignIn
           ? "Access the vast collection of resources, and stay updated"
           : "Please complete all fields and upload a valid university ID to gain access to the library"}
       </p>
@@ -99,7 +106,9 @@ const AuthForm = <T extends FieldValues>({
               render={({ field: formField }) => (
                 <FormItem>
                   <FormLabel className="capitalize text-light-100">
-                    {FIELD_NAMES[field as keyof typeof FIELD_NAMES] || field}
+                    {isAdminLogin && field === "email" 
+                      ? "Admin ID Number (or Email)" 
+                      : FIELD_NAMES[field as keyof typeof FIELD_NAMES] || field}
                   </FormLabel>
                   <FormControl>
                     {field === "universityCard" ? (
@@ -142,6 +151,22 @@ const AuthForm = <T extends FieldValues>({
           {isSignIn ? "Register here" : "Login"}
         </Link>
       </p>
+
+      {/* Admin hint button */}
+      {isSignIn && !isAdminLogin && (
+        <div className="mt-4 flex justify-center">
+          <p className="text-center text-base font-medium text-light-100">
+            If you are an admin,{" "}
+            <span 
+              onClick={() => setIsAdminLogin(true)}
+              className="font-bold text-primary hover:underline cursor-pointer"
+            >
+              click here
+            </span>{" "}
+            to login
+          </p>
+        </div>
+      )}
     </div>
   );
 };

@@ -3,6 +3,9 @@
 import { db } from "@/database/drizzle";
 import { users, borrowRecords, books } from "@/database/schema";
 import { eq, desc, ilike, and, sql, ne } from "drizzle-orm";
+import { sendAccountApprovedEmail, sendAccountRejectedEmail, sendReturnConfirmationEmail } from "@/lib/resend";
+import { workflowClient } from "@/lib/workflow";
+import bcrypt from "bcryptjs";
 
 export const getAllUsers = async (params: { query?: string; page?: number; sort?: string }) => {
   const { query = "", page = 1, sort = "desc" } = params;
@@ -60,11 +63,16 @@ export const updateUserStatus = async (
     const updatedUser = await db.update(users).set({ status }).where(eq(users.id, userId)).returning();
     
     if (status === "APPROVED" && updatedUser.length > 0) {
-      const { sendAccountApprovedEmail } = await import("../resend");
       try {
         await sendAccountApprovedEmail(updatedUser[0].email, updatedUser[0].fullname);
       } catch (emailError) {
         console.error("Failed to send approval email:", emailError);
+      }
+    } else if (status === "REJECTED" && updatedUser.length > 0) {
+      try {
+        await sendAccountRejectedEmail(updatedUser[0].email, updatedUser[0].fullname);
+      } catch (emailError) {
+        console.error("Failed to send rejection email:", emailError);
       }
     }
     
@@ -170,7 +178,6 @@ export const updateBorrowStatus = async (
         .set({ availableCopies: sql`available_copies - 1` })
         .where(eq(books.id, record[0].bookId));
         
-      const { workflowClient } = await import("../workflow");
       try {
         await workflowClient.trigger({
           url: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/api/workflows/borrow`,
@@ -202,7 +209,6 @@ export const updateBorrowStatus = async (
         const user = await db.select().from(users).where(eq(users.id, record[0].userId)).limit(1);
         
         if (book.length > 0 && user.length > 0) {
-          const { sendReturnConfirmationEmail } = await import("../resend");
           await sendReturnConfirmationEmail(user[0].email, user[0].fullname, book[0].title);
         }
       } catch (error) {
@@ -334,7 +340,6 @@ export const createUser = async (params: {
     }
 
     // Because it is created by Admin, we can assume it's approved and generate a random password
-    const bcrypt = await import("bcryptjs");
     const hashedPassword = await bcrypt.hash("Password123!", 10);
 
     const newUser = await db.insert(users).values({

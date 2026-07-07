@@ -55,11 +55,12 @@ export const signUp = async (params: AuthCredentials) => {
       },
     });
 
-    await signInWithCredentials({ email, password });
-
     return { success: true };
   } catch (error: any) {
     console.error("Sign-up error:", error);
+    if (error?.name === 'RedirectError' || error?.message?.includes('NEXT_REDIRECT')) {
+      throw error;
+    }
     return { success: false, error: "An error occurred during sign-up" };
   }
 };
@@ -82,19 +83,32 @@ export const signInWithCredentials = async (
   }
 
   try {
+    const existingUser = await db
+      .select()
+      .from(users)
+      .where(eq(users.email, email))
+      .limit(1);
+
+    const isAdmin = existingUser.length > 0 && existingUser[0].role === "ADMIN";
+
     const result = await signIn("credentials", {
       email,
       password,
       redirect: false,
+      redirectTo: isAdmin ? "/admin" : "/",
     });
 
     if (result?.error) {
       return { success: false, error: result.error };
     }
 
-    return { success: true };
+    return { success: true, redirectTo: isAdmin ? "/admin" : "/" };
   } catch (error: any) {
     console.error("Sign-in error:", error);
-    return { success: false, error: "Invalid credentials" };
+    // Rethrow redirect error to allow Next.js/NextAuth to process the redirect or handle headers correctly.
+    if (error?.name === 'RedirectError' || error?.message?.includes('NEXT_REDIRECT')) {
+      throw error;
+    }
+    return { success: false, error: "Either ID or password is incorrect, try again." };
   }
 };

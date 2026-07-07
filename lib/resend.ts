@@ -92,6 +92,25 @@ export const sendAccountApprovedEmail = async (email: string, name: string) => {
   });
 };
 
+export const sendAccountRejectedEmail = async (email: string, name: string) => {
+  const message = `
+    <h2 style="color: #EF3A4B; margin-top: 0; font-size: 20px; font-weight: 700;">Account Request Update</h2>
+    <p style="color: #D6E0FF; line-height: 1.6; margin-top: 24px; font-size: 14px;">Hi ${name},</p>
+    <p style="color: #D6E0FF; line-height: 1.6; font-size: 14px;">
+      We regret to inform you that your BookWise account request could not be approved at this time. This is usually due to an unverified or invalid University ID card.
+    </p>
+    <p style="color: #D6E0FF; line-height: 1.6; font-size: 14px; margin-top: 24px;">
+      If you believe this is a mistake, please reach out to the administration office with a clear copy of your valid University ID.
+    </p>
+  `;
+
+  return sendEmail({
+    email,
+    subject: "Account Request Update",
+    message: getEmailLayout(message, "Best regards,"),
+  });
+};
+
 export const sendBorrowConfirmationEmail = async (
   email: string,
   name: string,

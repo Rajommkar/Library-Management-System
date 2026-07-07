@@ -2,6 +2,7 @@ import React, { ReactNode } from "react";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
+import { Toaster } from "@/components/ui/toaster";
 
 const Layout = async ({ children }: { children: ReactNode }) => {
   const session = await auth();
@@ -28,6 +29,7 @@ const Layout = async ({ children }: { children: ReactNode }) => {
           className="size-full object-cover"
         />
       </section>
+      <Toaster />
     </main>
   );
 };

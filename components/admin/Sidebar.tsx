@@ -8,6 +8,7 @@ import { adminSideBarLinks } from "@/constants";
 import { cn, getInitials } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Session } from "next-auth";
+import { signOut } from "next-auth/react";
 
 const Sidebar = ({ session }: { session: Session }) => {
   const pathname = usePathname();
@@ -83,9 +84,7 @@ const Sidebar = ({ session }: { session: Session }) => {
 
         <button 
           className="p-2 shrink-0" 
-          onClick={() => {
-            // Action handled outside or add client action
-          }}
+          onClick={() => signOut({ callbackUrl: '/sign-in' })}
         >
           <Image src="/icons/logout.svg" alt="logout" width={20} height={20} className="filter invert-[35%] sepia-[75%] saturate-[2229%] hue-rotate-[336deg] brightness-[98%] contrast-[95%]" />
         </button>
